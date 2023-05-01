@@ -1,6 +1,6 @@
 # proxybox
 
-A tool to storage and manage proxies on Windows.
+A tool to store and manage proxies on Windows.
 
 ## Usage
 
