@@ -1,5 +1,6 @@
 import collections.abc
 import contextlib
+import json
 import os
 import typing
 import winreg
@@ -14,6 +15,48 @@ T = typing.TypeVar('T')
 # noinspection PyAbstractClass
 class Manager(contextlib.AbstractContextManager, typing.Generic[T], collections.abc.MutableMapping[str, T]):
     pass
+
+
+class StorageManager(Manager[str]):
+    def __init__(self, path = '.box'):
+        self.path = path
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+
+    def _read(self):
+        data: dict
+        try:
+            with open(self.path, encoding='utf-8') as f:
+                return json.load(f)
+        except FileNotFoundError:
+            return {}
+
+    def _write(self, data):
+        with open(self.path, 'w+', encoding='utf-8') as f:
+            json.dump(data, f)
+
+    def __setitem__(self, k: str, v: str) -> None:
+        data = self._read()
+        data[k] = v
+        self._write(data)
+
+    def __delitem__(self, k: str) -> None:
+        data = self._read()
+        data.pop(k)
+        self._write(data)
+
+    def __getitem__(self, k: str) -> typing.Optional[str]:
+        return self._read().get(k)
+
+    def __len__(self) -> int:
+        raise len(self._read())
+
+    def __iter__(self) -> typing.Iterator[str]:
+        return iter(self._read())
 
 
 class RegistryManager(Manager[typing.Union[str, int]]):

@@ -35,14 +35,13 @@ class _DictManager(Manager[object]):
 
 
 class _ServiceManager(ServiceManager):
-    def __init__(self, operation: ProxyOperation):
-        super().__init__(operation=operation)
-
+    def __init__(self):
         self._registry = _DictManager()
         self._environment = _DictManager()
         self._ssh = _DictManager()
+        self._storage = _DictManager()
 
-    def registry(self) -> _DictManager:
+    def registry(self, operation: ProxyOperation) -> _DictManager:
         return self._registry
 
     def environment(self) -> _DictManager:
@@ -51,17 +50,20 @@ class _ServiceManager(ServiceManager):
     def ssh(self) -> _DictManager:
         return self._ssh
 
+    def storage(self) -> Manager:
+        return self._storage
+
 
 class Test(unittest.TestCase):
     def test_enable(self):
-        manager = _ServiceManager(operation=ProxyOperation.enable)
+        manager = _ServiceManager()
         uri = urllib.parse.urlparse('https://username:password@1.2.3.4:5555')
-        manager.operate_proxy(uri=uri)
+        manager.operate_proxy(ProxyOperation.enable, uri=uri)
 
         self.assertEqual({
             'ProxyEnable': 1,
             'ProxyServer': '1.2.3.4:5555',
-        }, manager.registry().value)
+        }, manager.registry(ProxyOperation.enable).value)
 
         self.assertEqual({
             'http_proxy': 'http://username:password@1.2.3.4:5555',
@@ -69,12 +71,12 @@ class Test(unittest.TestCase):
         }, manager.environment().value)
 
     def test_disable(self):
-        manager = _ServiceManager(operation=ProxyOperation.disable)
+        manager = _ServiceManager()
         uri = urllib.parse.urlparse('https://username:password@1.2.3.4:5555')
-        manager.operate_proxy(uri=uri)
+        manager.operate_proxy(ProxyOperation.disable, uri=uri)
 
         self.assertEqual({
             'ProxyEnable': 0,
-        }, manager.registry().value)
+        }, manager.registry(ProxyOperation.disable).value)
 
         self.assertEqual({}, manager.environment().value)

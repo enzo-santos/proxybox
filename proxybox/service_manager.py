@@ -9,11 +9,8 @@ from proxy_manager.manager import Manager
 
 
 class ServiceManager(abc.ABC):
-    def __init__(self, *, operation: ProxyOperation):
-        self.operation = operation
-
     @abc.abstractmethod
-    def registry(self) -> Manager:
+    def registry(self, operation: ProxyOperation) -> Manager:
         pass
 
     @abc.abstractmethod
@@ -24,9 +21,13 @@ class ServiceManager(abc.ABC):
     def ssh(self) -> Manager:
         pass
 
-    def operate_proxy(self, *, uri: typing.Optional[urllib.parse.ParseResult]) -> typing.Iterable[str]:
-        with self.registry() as registry:
-            if self.operation == ProxyOperation.read or self.operation == ProxyOperation.update:
+    @abc.abstractmethod
+    def storage(self) -> Manager:
+        pass
+
+    def operate_proxy(self, operation: ProxyOperation, *, uri: typing.Optional[urllib.parse.ParseResult]) -> typing.Iterable[str]:
+        with self.registry(operation) as registry:
+            if operation == ProxyOperation.read or operation == ProxyOperation.update:
                 is_enabled = registry['ProxyEnable']
                 if is_enabled:
                     netloc = registry['ProxyServer']
@@ -34,13 +35,13 @@ class ServiceManager(abc.ABC):
                 else:
                     yield None
 
-            if self.operation != ProxyOperation.read:
+            if operation != ProxyOperation.read:
                 will_enable: bool
-                if self.operation == ProxyOperation.update:
+                if operation == ProxyOperation.update:
                     will_enable = not is_enabled
-                elif self.operation == ProxyOperation.enable:
+                elif operation == ProxyOperation.enable:
                     will_enable = True
-                elif self.operation == ProxyOperation.disable:
+                elif operation == ProxyOperation.disable:
                     will_enable = False
 
                 # Updating registry
