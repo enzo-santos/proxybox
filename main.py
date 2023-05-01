@@ -2,9 +2,9 @@ import argparse
 import os
 import urllib.parse
 
-from proxy_manager import ProxyOperation
-from proxy_manager.manager import Manager, RegistryManager, EnvironmentManager, SshManager, StorageManager
-from proxy_manager.service_manager import ServiceManager
+from proxybox import ProxyOperation
+from proxybox.manager import Manager, RegistryManager, EnvironmentManager, SshManager, StorageManager
+from proxybox.service_manager import ServiceManager
 
 
 class _ServiceManager(ServiceManager):

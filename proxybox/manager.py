@@ -7,7 +7,7 @@ import winreg
 
 import sshconf
 
-from proxy_manager import ProxyOperation
+from proxybox import ProxyOperation
 
 T = typing.TypeVar('T')
 

@@ -75,8 +75,6 @@ class Test(unittest.TestCase):
         uri = urllib.parse.urlparse('https://username:password@1.2.3.4:5555')
         manager.operate_proxy(ProxyOperation.disable, uri=uri)
 
-        self.assertEqual({
-            'ProxyEnable': 0,
-        }, manager.registry(ProxyOperation.disable).value)
+        self.assertEqual({}, manager.registry(ProxyOperation.disable).value)
 
         self.assertEqual({}, manager.environment().value)

@@ -4,8 +4,8 @@ import shutil
 import typing
 import urllib.parse
 
-from proxy_manager import ProxyOperation
-from proxy_manager.manager import Manager
+from proxybox import ProxyOperation
+from proxybox.manager import Manager
 
 
 class ServiceManager(abc.ABC):
